@@ -205,3 +205,4 @@
 ::ffff:127.0.0.1 - - [09/Sep/2021:17:59:47 +0000] "POST /api/post HTTP/1.1" 200 135 "-" "Thunder Client (https://www.thunderclient.io)"
 ::ffff:127.0.0.1 - - [09/Sep/2021:17:59:56 +0000] "POST /api/post HTTP/1.1" 200 120 "-" "Thunder Client (https://www.thunderclient.io)"
 ::ffff:127.0.0.1 - - [09/Sep/2021:18:00:21 +0000] "POST /api/post HTTP/1.1" 200 146 "-" "Thunder Client (https://www.thunderclient.io)"
+::1 - - [15/Sep/2021:17:45:03 +0000] "GET / HTTP/1.1" 200 467 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36"
