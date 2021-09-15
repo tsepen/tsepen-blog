@@ -1,87 +1,57 @@
-// const http = require('http')
-// const path = require('path')
-// const fs = require('fs')
+const express = require('express')
+const path = require('path')
+const chalk = require('chalk')
+const morgan = require('morgan')
+const fs = require('fs')
+const mongoose = require('mongoose')
+const methodOverride = require('method-override')
+const createPath = require('./helpers/create-path')
 
-// const { connection } = require('./database')
+require('dotEnv').config()
 
-// connection.connect()
+const postRoutes = require('./routes/post-routes')
+const apiPostRoutes = require('./routes/api-post-routes')
 
-// connection.query(
-//   'SELECT * FROM admins WHERE name="Andrey" LIMIT 100;',
-//   function (error, results, fields) {
-//     if (error) throw error
+const errorMsg = chalk.bgKeyword('white').redBright
+const successMsg = chalk.bgKeyword('green').white
 
-//     console.log(results[0].id)
-//   }
-// )
+const db = process.env.MONGO_URL
 
-// connection.end()
+mongoose
+  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then((res) => {
+    console.log(successMsg('connect db...'))
+  })
+  .catch((err) => console.error(err))
 
-// const PORT = 3000
+const app = express()
 
-// const data = [{ name: 'lomaz' }, { name: 'ota' }]
+app.set('view engine', 'ejs')
 
-// const log = (logData) => {
-//   fs.appendFile(
-//     './logs/log.txt',
-//     `${new Date()}: ${logData}\n`,
-//     (data, error) => {
-//       if (error) {
-//         console.error(error)
-//       }
-//     }
-//   )
-// }
+const PORT = 3000
 
-// const server = http.createServer((req, res) => {
-//   const createPath = (page) => path.resolve(__dirname, 'views', `${page}.html`)
+app.listen(PORT, (error) => {
+  error ? console.log(errorMsg(error)) : console.log(successMsg('listen...'))
+})
 
-//   res.setHeader('Content-type', 'text/html')
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, 'logs/access.log'),
+  { flags: 'a' }
+)
 
-//   let basePath = ''
+app.use(morgan('combined', { stream: accessLogStream }))
 
-//   const url = req.url.slice(1)
+app.use(express.urlencoded({ extended: false }))
 
-//   switch (url) {
-//     case '':
-//     case 'home':
-//     case 'index':
-//       basePath = createPath('index')
-//       break
-//     case '/about':
-//       res.statusCode = 301
-//       res.setHeader('Location', '/user')
-//       res.end()
-//       break
-//     default:
-//       basePath = createPath(url)
-//   }
+app.use(methodOverride('_method'))
 
-//   fs.readFile(basePath, (err, data) => {
-//     if (err) {
-//       fs.readFile(createPath('404'), (err, d) => {
-//         if (err) {
-//           res.statusCode = 500
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 
-//           res.end
-//         } else {
-//           res.statusCode = 404
+app.use(postRoutes)
 
-//           res.write(d)
+app.use(apiPostRoutes)
 
-//           res.end()
-//         }
-//       })
-//     } else {
-//       res.write(data)
-
-//       res.end()
-//     }
-//   })
-
-//   log(req.url)
-// })
-
-// server.listen(PORT, 'localhost', (error) => {
-//   error ? console.log(error) : console.log('lister...')
-// })
+app.use((req, res) => {
+  const title = '404!'
+  res.status(404).render(createPath('404'), { title })
+})
