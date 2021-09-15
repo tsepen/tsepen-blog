@@ -28,9 +28,7 @@ const app = express()
 
 app.set('view engine', 'ejs')
 
-const PORT = 3000
-
-app.listen(PORT, (error) => {
+app.listen(process.env.PORT, (error) => {
   error ? console.log(errorMsg(error)) : console.log(successMsg('listen...'))
 })
 
